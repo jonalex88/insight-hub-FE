@@ -30,9 +30,17 @@ const AREA_ENDPOINT: Record<string, string> = {
   "Countries":       `${API_BASE}/countries`,
   "Channels":        `${API_BASE}/channels`,
   "Banks":           `${API_BASE}/banks`,
+  "POS Providers":   `${API_BASE}/pos-providers`,
 };
 
-export type EntityPatch = { short_name?: string; description?: string; logo?: string };
+export type EntityPatch = {
+  short_name?: string;
+  description?: string;
+  logo?: string;
+  primary_industry?: string;
+  rev_share_enabled?: boolean;
+  rev_share_pct?: number | null;
+};
 
 export async function patchEntity(area: string, entityId: string, fields: EntityPatch): Promise<void> {
   const base = AREA_ENDPOINT[area];

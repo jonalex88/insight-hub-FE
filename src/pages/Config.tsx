@@ -25,6 +25,7 @@ const TABS: { area: Area; label: string; singular: string }[] = [
   { area: "Platforms",       label: "Platforms",       singular: "Platform"        },
   { area: "Countries",       label: "Countries",       singular: "Country"         },
   { area: "Banks",           label: "Banks",           singular: "Bank"            },
+  { area: "POS Providers",   label: "POS Providers",   singular: "POS Provider"    },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -344,26 +345,44 @@ const EntityRow = ({ entity, rules, projection, onProjectionChange, onAdd, onUpd
     }
   };
 
-  const initShortName   = getShortName(entity.id, entity.shortName);
-  const initDescription = entity.description ?? "";
-  const initLogo        = entity.logo ?? "";
+  const initShortName       = getShortName(entity.id, entity.shortName);
+  const initDescription     = entity.description ?? "";
+  const initLogo            = entity.logo ?? "";
+  const initPrimaryIndustry = entity.primaryIndustry ?? "";
+  const initRevShareEnabled = entity.revShareEnabled ?? false;
+  const initRevSharePct     = entity.revSharePct?.toString() ?? "";
 
-  const [shortName,   setShortName]   = useState(initShortName);
-  const [description, setDescription] = useState(initDescription);
-  const [logo,        setLogo]        = useState(initLogo);
+  const [shortName,       setShortName]       = useState(initShortName);
+  const [description,     setDescription]     = useState(initDescription);
+  const [logo,            setLogo]            = useState(initLogo);
+  const [primaryIndustry, setPrimaryIndustry] = useState(initPrimaryIndustry);
+  const [revShareEnabled, setRevShareEnabled] = useState(initRevShareEnabled);
+  const [revSharePct,     setRevSharePct]     = useState(initRevSharePct);
+
+  const isPOS = entity.area === "POS Providers";
 
   const isDirty =
-    shortName.trim()   !== initShortName.trim()   ||
-    description.trim() !== initDescription.trim() ||
-    logo.trim()        !== initLogo.trim();
+    shortName.trim()       !== initShortName.trim()       ||
+    description.trim()     !== initDescription.trim()     ||
+    logo.trim()            !== initLogo.trim()            ||
+    (isPOS && (
+      primaryIndustry.trim() !== initPrimaryIndustry.trim() ||
+      revShareEnabled        !== initRevShareEnabled        ||
+      revSharePct.trim()     !== initRevSharePct.trim()
+    ));
 
   const handleApply = async () => {
     if (!isDirty) return;
     saveShortName(entity.id, shortName.trim());
     await patchEntity(entity.area, entity.id, {
-      short_name:  shortName.trim(),
-      description: description.trim() || undefined,
-      logo:        logo.trim() || undefined,
+      short_name:         shortName.trim(),
+      description:        description.trim() || undefined,
+      logo:               logo.trim() || undefined,
+      ...(isPOS && {
+        primary_industry:  primaryIndustry.trim() || undefined,
+        rev_share_enabled: revShareEnabled,
+        rev_share_pct:     revShareEnabled && revSharePct ? Number(revSharePct) : null,
+      }),
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -445,6 +464,56 @@ const EntityRow = ({ entity, rules, projection, onProjectionChange, onAdd, onUpd
                 className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-cyan/40"
               />
             </div>
+
+            {/* POS Provider-specific fields */}
+            {isPOS && (
+              <>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Primary Industry</label>
+                  <input
+                    type="text"
+                    value={primaryIndustry}
+                    onChange={(e) => setPrimaryIndustry(e.target.value)}
+                    placeholder="e.g. Retail, Hospitality, Pharmacy"
+                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-cyan/40"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Revenue Share</label>
+                    <button
+                      type="button"
+                      onClick={() => setRevShareEnabled((v) => !v)}
+                      className={cn(
+                        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+                        revShareEnabled ? "bg-emerald-500" : "bg-muted"
+                      )}
+                    >
+                      <span className={cn(
+                        "pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform",
+                        revShareEnabled ? "translate-x-4" : "translate-x-0"
+                      )} />
+                    </button>
+                  </div>
+                  {revShareEnabled && (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={revSharePct}
+                        onChange={(e) => setRevSharePct(e.target.value)}
+                        placeholder="e.g. 2.5"
+                        className="w-32 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                      />
+                      <span className="text-sm text-muted-foreground">%</span>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
             <button
               onClick={handleApply}
               disabled={!isDirty}
@@ -555,34 +624,37 @@ const EntityRow = ({ entity, rules, projection, onProjectionChange, onAdd, onUpd
             )}
           </div>
 
-          {/* Existing rules */}
-          {rules.map((rule) => (
-            <RuleRowItem
-              key={rule.id}
-              rule={rule}
-              onUpdate={onUpdate}
-              onDelete={() => onDelete(rule.id)}
-            />
-          ))}
+          {/* Rules (not applicable for POS Providers) */}
+          {!isPOS && (
+            <>
+              {rules.map((rule) => (
+                <RuleRowItem
+                  key={rule.id}
+                  rule={rule}
+                  onUpdate={onUpdate}
+                  onDelete={() => onDelete(rule.id)}
+                />
+              ))}
 
-          {rules.length === 0 && !adding && (
-            <p className="text-sm text-muted-foreground/50 py-1">No rules yet. Add one below.</p>
-          )}
+              {rules.length === 0 && !adding && (
+                <p className="text-sm text-muted-foreground/50 py-1">No rules yet. Add one below.</p>
+              )}
 
-          {/* Add rule form */}
-          {adding ? (
-            <RuleForm
-              onSave={async (rule) => { await onAdd(rule); setAdding(false); }}
-              onCancel={() => setAdding(false)}
-            />
-          ) : (
-            <button
-              onClick={() => setAdding(true)}
-              className="mt-2 flex items-center gap-2 text-xs font-semibold text-cyan hover:text-cyan/80 transition-colors"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Add rule
-            </button>
+              {adding ? (
+                <RuleForm
+                  onSave={async (rule) => { await onAdd(rule); setAdding(false); }}
+                  onCancel={() => setAdding(false)}
+                />
+              ) : (
+                <button
+                  onClick={() => setAdding(true)}
+                  className="mt-2 flex items-center gap-2 text-xs font-semibold text-cyan hover:text-cyan/80 transition-colors"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add rule
+                </button>
+              )}
+            </>
           )}
         </div>
       )}

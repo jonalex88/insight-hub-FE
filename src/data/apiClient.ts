@@ -52,7 +52,25 @@ export const AREA_PATH: Record<string, string> = {
   "Platforms":       "platforms",
   "Countries":       "countries",
   "Banks":           "banks",
+  "POS Providers":   "pos-providers",
 };
+
+export interface PosProviderStatsRow {
+  id: string;
+  name: string;
+  short_name: string;
+  logo: string | null;
+  description: string | null;
+  primary_industry: string | null;
+  rev_share_enabled: boolean;
+  rev_share_pct: number | null;
+  store_count: number;
+  lane_count: number;
+}
+
+export function getPosProviderStats(): Promise<PosProviderStatsRow[]> {
+  return apiFetch(`${BASE}/pos-providers/stats/latest`);
+}
 
 async function apiFetch<T>(url: string): Promise<T> {
   const res = await fetch(url);

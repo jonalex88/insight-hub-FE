@@ -56,7 +56,8 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
       <NavItem to="/channels"  label="Channels"        sub onNavigate={onNavigate} />
       <NavItem to="/platforms" label="Platforms"       sub onNavigate={onNavigate} />
       <NavItem to="/countries" label="Countries"       sub onNavigate={onNavigate} />
-      <NavItem to="/banks"     label="Banks"           sub onNavigate={onNavigate} />
+      <NavItem to="/banks"          label="Banks"          sub onNavigate={onNavigate} />
+      <NavItem to="/pos-providers" label="POS Providers"  sub onNavigate={onNavigate} />
 
       <div className="pt-2" />
       <NavItem to="/reports" label="Data"   onNavigate={onNavigate} />

@@ -14,6 +14,7 @@ import Reports from "./pages/Reports.tsx";
 import Compliance from "./pages/Compliance.tsx";
 import ApiDocs from "./pages/ApiDocs.tsx";
 import DbSchema from "./pages/DbSchema.tsx";
+import POSProvidersPage from "./pages/POSProvidersPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/countries/:slug" element={<SolutionDetailPage area="Countries" />} />
           <Route path="/banks" element={<BanksPage />} />
           <Route path="/banks/:slug" element={<SolutionDetailPage area="Banks" />} />
+          <Route path="/pos-providers" element={<POSProvidersPage />} />
           <Route path="/payment-methods" element={<Index />} />
           <Route path="/payment-methods/:slug" element={<SolutionDetailPage area="Payment Methods" />} />
           <Route path="/reports" element={<Reports />} />

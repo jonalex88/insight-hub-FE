@@ -20,6 +20,7 @@ const AREA_ENDPOINT: Record<string, string> = {
   "Platforms":       `${API_BASE}/platforms`,
   "Countries":       `${API_BASE}/countries`,
   "Banks":           `${API_BASE}/banks`,
+  "POS Providers":   `${API_BASE}/pos-providers`,
 };
 
 export function loadCreatedEntities(): Solution[] {

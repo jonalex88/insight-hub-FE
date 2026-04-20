@@ -2,6 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { getStats30d, getStatsMonthly, AREA_PATH } from "@/data/apiClient";
 import { Solution, Area } from "@/data/solutions";
+import { getAllSolutions } from "@/data/entityStore";
+
+const STATIC_ONLY_AREAS: Area[] = ["POS Providers"];
 
 const ACCENTS: Solution["accent"][] = ["cyan", "violet", "emerald", "amber", "rose", "sky"];
 
@@ -23,6 +26,7 @@ function ymToLabel(ym: string): string {
 }
 
 export function useAreaSolutions(area: Area) {
+  const isStaticOnly = STATIC_ONLY_AREAS.includes(area);
   const path = AREA_PATH[area];
 
   const { data: stats30d, isLoading: l1, error: e1 } = useQuery({
@@ -30,6 +34,7 @@ export function useAreaSolutions(area: Area) {
     queryFn:  () => getStats30d(path),
     staleTime: 5 * 60 * 1000,
     retry: 2,
+    enabled: !isStaticOnly,
   });
 
   const { data: monthly, isLoading: l2 } = useQuery({
@@ -37,9 +42,11 @@ export function useAreaSolutions(area: Area) {
     queryFn:  () => getStatsMonthly(path, 12),
     staleTime: 5 * 60 * 1000,
     retry: 2,
+    enabled: !isStaticOnly,
   });
 
   const solutions = useMemo((): Solution[] => {
+    if (isStaticOnly) return getAllSolutions(area);
     if (!stats30d) return [];
 
     const byEntity: Record<string, typeof monthly> = {};
@@ -74,7 +81,7 @@ export function useAreaSolutions(area: Area) {
         region:             row.region ?? undefined,
       };
     });
-  }, [stats30d, monthly, area]);
+  }, [stats30d, monthly, area, isStaticOnly]);
 
-  return { solutions, isLoading: l1 || l2, error: e1 };
+  return { solutions, isLoading: isStaticOnly ? false : (l1 || l2), error: isStaticOnly ? null : e1 };
 }
