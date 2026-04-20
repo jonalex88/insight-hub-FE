@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Transpector — Transaction Junction inspired analytics design system.
+   All colors HSL. Define every token here. */
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --background: 220 30% 97%;
+    --foreground: 220 40% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 40% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 40% 12%;
+
+    /* Brand — TJ navy + cyan */
+    --navy: 218 60% 11%;
+    --navy-deep: 220 65% 8%;
+    --navy-foreground: 0 0% 100%;
+    --cyan: 196 95% 55%;
+    --cyan-glow: 196 100% 65%;
+    --cyan-foreground: 220 65% 8%;
+
+    --primary: 218 60% 11%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 25% 94%;
+    --secondary-foreground: 218 60% 11%;
+
+    --muted: 220 20% 94%;
+    --muted-foreground: 220 15% 42%;
+
+    --accent: 196 95% 55%;
+    --accent-foreground: 220 65% 8%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 65% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 28 92% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 220 20% 88%;
+    --input: 220 20% 90%;
+    --ring: 196 95% 55%;
+
+    --radius: 0.875rem;
+
+    /* Gradients */
+    --gradient-sidebar: linear-gradient(180deg, hsl(218 60% 11%) 0%, hsl(220 65% 8%) 100%);
+    --gradient-cyan: linear-gradient(135deg, hsl(196 95% 55%) 0%, hsl(210 95% 60%) 100%);
+    --gradient-card-hover: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(196 60% 97%) 100%);
+    --gradient-kpi: linear-gradient(135deg, hsl(218 60% 11%) 0%, hsl(220 70% 18%) 100%);
+
+    /* Shadows */
+    --shadow-card: 0 1px 2px hsl(220 40% 12% / 0.04), 0 4px 16px hsl(220 40% 12% / 0.06);
+    --shadow-card-hover: 0 8px 24px hsl(218 60% 11% / 0.12), 0 2px 6px hsl(218 60% 11% / 0.06);
+    --shadow-cyan: 0 8px 24px hsl(196 95% 55% / 0.25);
+
+    /* Sidebar (legacy shadcn tokens kept aligned) */
+    --sidebar-background: 218 60% 11%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 196 95% 55%;
+    --sidebar-primary-foreground: 220 65% 8%;
+    --sidebar-accent: 220 50% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 40% 18%;
+    --sidebar-ring: 196 95% 55%;
+
+    --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .bg-gradient-sidebar { background: var(--gradient-sidebar); }
+  .bg-gradient-cyan { background: var(--gradient-cyan); }
+  .bg-gradient-kpi { background: var(--gradient-kpi); }
+
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-card-hover { box-shadow: var(--shadow-card-hover); }
+  .shadow-cyan { box-shadow: var(--shadow-cyan); }
+}
